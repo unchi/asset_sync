@@ -24,6 +24,8 @@ module AssetSync
     attr_accessor :fog_provider          # Currently Supported ['AWS', 'Rackspace']
     attr_accessor :fog_directory         # e.g. 'the-bucket-name'
     attr_accessor :fog_region            # e.g. 'eu-west-1'
+    attr_accessor :fog_endpoint          # e.g. 'https://str.cloudn-service.com'
+
 
     # Amazon AWS
     attr_accessor :aws_access_key_id, :aws_secret_access_key, :aws_reduced_redundancy, :aws_iam_roles
@@ -139,6 +141,7 @@ module AssetSync
       self.fog_provider           = yml["fog_provider"]
       self.fog_directory          = yml["fog_directory"]
       self.fog_region             = yml["fog_region"]
+      self.fog_endpoint           = yml["fog_endpoint"]
       self.aws_access_key_id      = yml["aws_access_key_id"]
       self.aws_secret_access_key  = yml["aws_secret_access_key"]
       self.aws_reduced_redundancy = yml["aws_reduced_redundancy"]
@@ -158,18 +161,6 @@ module AssetSync
       self.run_on_precompile      = yml["run_on_precompile"] if yml.has_key?("run_on_precompile")
       self.invalidate             = yml["invalidate"] if yml.has_key?("invalidate")
       self.cdn_distribution_id    = yml['cdn_distribution_id'] if yml.has_key?("cdn_distribution_id")
-
-      # TODO deprecate the other old style config settings. FML.
-      self.aws_access_key_id      = yml["aws_access_key"] if yml.has_key?("aws_access_key")
-      self.aws_secret_access_key  = yml["aws_access_secret"] if yml.has_key?("aws_access_secret")
-      self.fog_directory          = yml["aws_bucket"] if yml.has_key?("aws_bucket")
-      self.fog_region             = yml["aws_region"] if yml.has_key?("aws_region")
-
-      # TODO deprecate old style config settings
-      self.aws_access_key_id      = yml["access_key_id"] if yml.has_key?("access_key_id")
-      self.aws_secret_access_key  = yml["secret_access_key"] if yml.has_key?("secret_access_key")
-      self.fog_directory          = yml["bucket"] if yml.has_key?("bucket")
-      self.fog_region             = yml["region"] if yml.has_key?("region")
 
       self.public_path            = yml["public_path"] if yml.has_key?("public_path")
     end
@@ -207,6 +198,8 @@ module AssetSync
       end
 
       options.merge!({:region => fog_region}) if fog_region && !rackspace?
+      options.merge!({:endpoint => fog_endpoint}) if fog_endpoint && !rackspace?
+
       return options
     end
 
